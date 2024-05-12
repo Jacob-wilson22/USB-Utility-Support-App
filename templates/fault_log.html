@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fault Log</title>
+    <style>
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: auto;
+            color: black;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fault Log</h1>
+    <table>
+        <tr>
+            <th>Fault ID</th>
+            <th>Device ID</th>
+            <th>Fault Type</th>
+            <th>Floor Name</th>
+            <th>Room Name</th>
+            <th>Log Date</th>
+            <th>Log Time</th>
+            <th>Fault Severity</th>
+            <th>Fault Description</th>
+            <th>Logged By</th>
+        </tr>
+        {% for entry in fault_log_data %}
+        <tr>
+            <td>{{ entry[0] }}</td>
+            <td>{{ entry[1] }}</td>
+            <td>{{ entry[2] }}</td>
+            <td>{{ entry[3] }}</td>
+            <td>{{ entry[4] }}</td>
+            <td>{{ entry[5] }}</td>
+            <td>{{ entry[6] }}</td>
+            <td>{{ entry[7] }}</td>
+            <td>{{ entry[8] }}</td>
+            <td>{{ entry[9] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+{% endblock %}

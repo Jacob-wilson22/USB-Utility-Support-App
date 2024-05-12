@@ -5,12 +5,11 @@ from models import Fault_log
 from datetime import datetime
 from forms import DeviceLogForm
 
-
-
-
+# Creating blueprints for the application
 floors_blueprint = Blueprint('floors', __name__)
 rooms_blueprint = Blueprint('rooms', __name__)
 devices_blueprint = Blueprint('devices', __name__)
+fault_log_blueprint = Blueprint('fault_log', __name__)
 
 # Floor selection frame blueprint
 @floors_blueprint.route('/floors', methods=['GET'])
@@ -69,3 +68,10 @@ def devices(room_id):
 
 
     return render_template('devices.html', device_data=device_data, form=form)
+
+
+# Fault_log frame blueprint
+@fault_log_blueprint.route('/fault_log', methods=['GET'])
+def fault_log():
+    fault_log_data = query_fault_log()
+    return render_template('fault_log.html', fault_log_data=fault_log_data)

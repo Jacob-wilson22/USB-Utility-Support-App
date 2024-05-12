@@ -67,3 +67,12 @@ def query_faults():
     cursor.execute("SELECT fault_id, fault_type, fault_severity FROM faults")
     fault_data = cursor.fetchall()
     return fault_data
+
+
+# Queries all attributes from fault_log
+def query_fault_log():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM fault_log")
+    fault_log_data = cursor.fetchall()
+    return fault_log_data
