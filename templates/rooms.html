@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<html>
+<head>
+    <title>Room Selection</title>
+    <style>
+        .room {
+            width: 300px;
+            height: 50px;
+            background-color: lightgray;
+            border: 1px solid black;
+            margin: 10px;
+            color: black;
+            text-align: center;
+            line-height: 50px;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<h1>ROOMS</h1>
+
+{% for room in room_data %}
+  {% if room.floor_name == floor_name %}
+      <a href="/devices/{{ room[0] }}">
+        <div class="room">{{ room[1] }}</div>
+    </a>
+  {% endif %}
+{% endfor %}
+
+
+</body>
+</html>
+{% endblock %}

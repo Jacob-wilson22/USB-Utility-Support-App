@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rectangular Blocks</title>
+  <style>
+    /* Define styles for the header */
+    header {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* Define styles for the rectangular blocks */
+    .rectangle {
+      width: 1000px;
+      height: 100px;
+      background-color: lightgray;
+      margin: 20px auto;
+        color: black;
+      text-align: center;
+      line-height: 100px;
+      font-size: 18px;
+      border: 1px solid black;
+      cursor: pointer; /* Change cursor to pointer when hovering over the block */
+    }
+  </style>
+</head>
+<body>
+
+    <H1> FLOORS </H1>
+  <!-- Rectangular Blocks -->
+  <!-- Make one of the blocks clickable -->
+  {% set unique_floor_names = [] %}
+  {% for floor_name in floor_data %}
+    {% if floor_name not in unique_floor_names %}
+      <a href="/rooms/{{ floor_name }}">
+        <div class="rectangle">{{ floor_name }}</div>
+      </a>
+      {% set _ = unique_floor_names.append(floor_name) %}
+    {% endif %}
+  {% endfor %}
+
+</body>
+</html>
+{% endblock %}

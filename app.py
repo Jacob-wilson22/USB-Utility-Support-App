@@ -3,6 +3,7 @@ from models import db
 from config import Config
 from populate import populate_data
 from query import query_floors
+from views import floors_blueprint, rooms_blueprint, devices_blueprint
 
 
 # Flask creation and configuration
@@ -19,10 +20,16 @@ db.init_app(app)
 def DB_test():  # put application's code here
     return query_floors()
 
+
+#Register blueprints
+app.register_blueprint(floors_blueprint)
+app.register_blueprint(rooms_blueprint)
+app.register_blueprint(devices_blueprint)
+
 # Run application if executed as main script
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        populate_data()
+        #populate_data()
         app.run()
 

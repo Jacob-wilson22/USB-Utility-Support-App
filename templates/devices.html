@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        .device-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .device {
+            width: 150px;
+            height: 100px;
+            background-color: lightgray;
+            border: 1px solid black;
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+        form {
+        border: 1px solid black;
+        padding: 10px; /* Adjust padding as needed */
+        margin-top: 10px; /* Adjust margin as needed */
+    }
+    </style>
+
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Device Selection</title>
+    </head>
+    <body>
+
+    <h1>DEVICES</h1>
+    <div class="device-container">
+        {% for device in device_data %}
+            {% if device.room_id == room_id %}
+                <div class="device" onclick="showForm('{{ device }}')">{{ device }}</div>
+                <div id="deviceForm{{ device }}" class="hidden">
+                    <form id="form{{ device }}" method="post">
+                        {{ form.csrf_token }}
+                        <input type="hidden" name="device_id" value="{{ device }}">
+                        <div>
+                            <strong>Device ID:</strong> {{ device }}
+                        </div>
+                        <div>
+                            {{ form.fault_type.label }}:
+                            {{ form.fault_type }}
+                        </div>
+                        <div>
+                            {{ form.fault_severity.label }}:
+                            {{ form.fault_severity }}
+                        </div>
+                        <div>
+                            {{ form.fault_description.label }}:
+                            {{ form.fault_description }}
+                        </div>
+
+                        <div>
+                            {{ form.submit }}
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <script>
+        function showForm(device) {
+            document.getElementById('deviceForm' + device).classList.remove('hidden');
+        }
+    </script>
+    </body>
+    </html>
+{% endblock %}
