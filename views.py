@@ -1,10 +1,12 @@
 import json
-from flask import Blueprint, render_template, request
-from flask_login import current_user
+import logging
+from flask import Blueprint, render_template, request, redirect, flash, url_for, session
+from flask_login import login_required, login_user, logout_user, current_user
+from werkzeug.security import check_password_hash
 from query import *
-from models import Fault_log
+from models import Fault_log, User
 from datetime import datetime
-from forms import DeviceLogForm
+from forms import DeviceLogForm, RegisterForm, LoginForm
 import plotly.graph_objs as go
 from plotly.utils import PlotlyJSONEncoder
 
@@ -14,6 +16,94 @@ rooms_blueprint = Blueprint('rooms', __name__)
 devices_blueprint = Blueprint('devices', __name__)
 fault_log_blueprint = Blueprint('fault_log', __name__)
 graphs_blueprint = Blueprint('graphs', __name__)
+users_blueprint = Blueprint('users', __name__)
+index_blueprint = Blueprint('index', __name__)
+
+
+# Register frame blueprint
+@users_blueprint.route('/register', methods=['GET', 'POST'])
+def register():
+    from app import db
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+
+        if user:
+            flash('Username address already exists')
+            return render_template('register.html', form=form)
+
+        new_user = User(username=form.username.data, password=form.password.data, role='admin')
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for('users.login'))
+
+
+    return render_template('register.html', form=form)
+
+
+# Login frame blueprint
+@users_blueprint.route('/login', methods=['GET', 'POST'])
+def login():
+    from app import db
+
+    if not session.get('logins'):
+        session['logins'] = 0
+        # if login attempts is 3 or more create an error message
+    elif session.get('logins') >= 3:
+        flash('Number of incorrect logins exceeded')
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+
+        session['logins'] += 1
+        user = User.query.filter_by(username=form.username.data).first()
+
+        if not user or not check_password_hash(user.password, form.password.data):
+            if session['logins'] == 3:
+                flash('Number of incorrect logins exceeded')
+            elif session['logins'] == 2:
+                flash('Please check your login details and try again. 1 login attempt remaining')
+            else:
+                flash('Please check your login details and try again. 2 login attempts remaining')
+
+            return render_template('login.html', form=form)
+
+        session['logins'] = 0
+
+        login_user(user)
+
+        user.last_logged_in = user.current_logged_in
+        user.current_logged_in = datetime.now()
+        db.session.commit()
+
+        logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.username, request.remote_addr)
+
+        return index()
+
+    return render_template('login.html', form=form)
+
+
+# Logout Blueprint
+@users_blueprint.route('/logout')
+@login_required
+def logout():
+    logging.warning('SECURITY - Log out [%s, %s, %s]', current_user.id, current_user.username, request.remote_addr)
+    logout_user()
+    return redirect(url_for('users.login'))
+
+@index_blueprint.route('/index', methods=['GET'])
+@login_required
+def index():
+    month_data = query_month_data()
+    print(month_data)
+    # Implement the logic to render the index page (floors)
+    return render_template('index.html')  # Assuming your index page is named 'index.html'
+
+
 
 # Floor selection frame blueprint
 @floors_blueprint.route('/floors', methods=['GET'])

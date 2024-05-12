@@ -1,9 +1,10 @@
-from flask import Flask
-from models import db
+from flask import Flask, redirect, url_for
+from flask_login import LoginManager
 from config import Config
+from models import db, User
 from populate import populate_data
-from query import query_floors
-from views import floors_blueprint, rooms_blueprint, devices_blueprint, fault_log_blueprint, graphs_blueprint
+from views import floors_blueprint, rooms_blueprint, devices_blueprint, fault_log_blueprint,\
+    graphs_blueprint, users_blueprint, index_blueprint
 
 
 # Flask creation and configuration
@@ -16,17 +17,32 @@ app.secret_key = Config.SECRET_KEY
 db.init_app(app)
 
 
+# Initialise login manager
+login_manager = LoginManager()
+login_manager.login_view = 'users.login'
+login_manager.init_app(app)
+
+
+# User loader function for login manager
+@login_manager.user_loader
+def load_user(id):
+        return User.query.get(int(id))
+
+
+# Route for login page
 @app.route('/')
-def DB_test():  # put application's code here
-    return query_floors()
+def index():
+    return redirect(url_for('users.login'))
 
 
-#Register blueprints
+# Register blueprints
 app.register_blueprint(floors_blueprint)
 app.register_blueprint(rooms_blueprint)
 app.register_blueprint(devices_blueprint)
 app.register_blueprint(fault_log_blueprint)
 app.register_blueprint(graphs_blueprint)
+app.register_blueprint(users_blueprint)
+app.register_blueprint(index_blueprint)
 
 # Run application if executed as main script
 if __name__ == '__main__':

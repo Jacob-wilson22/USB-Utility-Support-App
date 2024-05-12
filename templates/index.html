@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
+
+</head>
+<style>
+    .rectangle {
+     /* Half the page width minus margins */
+    height: 150px;
+        /* Adjust height */
+    background-color: lightgray; /* Grey rectangles */
+    border: 1px solid black;
+    margin: 20px; /* Adjust margin */
+    color: black;
+    text-align: center;
+    line-height: 150px; /* Center content vertically */
+    clear: both; /* Ensure each rectangle starts on a new line */
+}
+</style>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>HOME</h1>
+  </header>
+
+  <!-- Clickable Rectangles for Navigation -->
+  <a href="floors">
+    <div class="rectangle">Report a Device</div>
+  </a>
+  <a href="graphs">
+    <div class="rectangle">Data Visualisation</div>
+  </a>
+  <a href="fault_log">
+    <div class="rectangle">Fault log</div>
+  </a>
+  <a href="tasks">
+    <div class="rectangle">Tasks</div>
+  </a>
+
+  <!-- Footer -->
+  <footer>
+    <h1></h1>
+  </footer>
+</body>
+</html>
+{% endblock %}
