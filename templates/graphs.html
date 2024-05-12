@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphs</title>
+    <!-- Include Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div id="bar-chart-container"></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div id="pie-chart-container"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div id="line-chart-container"></div> <!-- New div container for the line chart -->
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <div id="histogram-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Parse the JSON data for the charts passed from Flask
+    var bar_graphData = JSON.parse('{{ bar_graph | safe }}');
+    var pie_chartData = JSON.parse('{{ pie_chart | safe }}');
+    var histogramData = JSON.parse('{{ histogram | safe }}');
+    var line_chartData = JSON.parse('{{ line_chart | safe }}'); // Assuming you pass the JSON data for the line chart from Flask
+
+    // Render the bar chart using Plotly.js
+    Plotly.newPlot('bar-chart-container', bar_graphData);
+
+    // Render the pie chart using Plotly.js
+    Plotly.newPlot('pie-chart-container', pie_chartData);
+
+    // Render the histogram using Plotly.js
+    Plotly.newPlot('histogram-container', histogramData);
+
+    // Render the line chart using Plotly.js
+    Plotly.newPlot('line-chart-container', line_chartData);
+</script>
+
+</body>
+</html>
+{% endblock %}

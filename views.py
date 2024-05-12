@@ -1,15 +1,19 @@
+import json
 from flask import Blueprint, render_template, request
 from flask_login import current_user
 from query import *
 from models import Fault_log
 from datetime import datetime
 from forms import DeviceLogForm
+import plotly.graph_objs as go
+from plotly.utils import PlotlyJSONEncoder
 
 # Creating blueprints for the application
 floors_blueprint = Blueprint('floors', __name__)
 rooms_blueprint = Blueprint('rooms', __name__)
 devices_blueprint = Blueprint('devices', __name__)
 fault_log_blueprint = Blueprint('fault_log', __name__)
+graphs_blueprint = Blueprint('graphs', __name__)
 
 # Floor selection frame blueprint
 @floors_blueprint.route('/floors', methods=['GET'])
@@ -75,3 +79,70 @@ def devices(room_id):
 def fault_log():
     fault_log_data = query_fault_log()
     return render_template('fault_log.html', fault_log_data=fault_log_data)
+
+
+# Data visualisation frame blueprint
+@graphs_blueprint.route('/graphs', methods=['GET'])
+def graphs():
+    fault_type_freq_data = query_fault_type_freq()
+
+    fault_types = [row[0] for row in fault_type_freq_data]
+    counts = [row[1] for row in fault_type_freq_data]
+
+    bar_graph = go.Bar(
+        x=fault_types,
+        y=counts
+
+    )
+
+    bar_graph_json = json.dumps([bar_graph], cls=PlotlyJSONEncoder)
+
+    floor_freq_data = query_floor_freq()
+
+    labels = [row[0] for row in floor_freq_data]
+    values = [row[1] for row in floor_freq_data]
+
+    # Create Pie chart
+    pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # Customize layout
+    pie_chart.update_layout(title='Fault Floor Frequency')
+
+    pie_chart_json = json.dumps(pie_chart, cls=PlotlyJSONEncoder)
+
+    room_freq_data = query_room_freq()
+    print(room_freq_data)
+    room_name = [row[0] for row in room_freq_data]
+    frequency = [row[1] for row in room_freq_data]
+    # Create a histogram trace
+    rooms_barchart = go.Bar(
+        x=room_name,
+        y=frequency,
+    )
+
+    # Create a layout for the histogram
+    layout = go.Layout(
+        title='Faults per Room',
+        xaxis=dict(title='Room_Name'),
+        yaxis=dict(title='Frequency'),
+
+    )
+
+    # Create a figure
+    figure = go.Figure(data=[rooms_barchart], layout=layout)
+
+    # Convert the figure to JSON
+    histogram_json = json.dumps(figure, cls=PlotlyJSONEncoder)
+
+    month_data = query_month_data()
+    months = [row[0] for row in month_data]
+    frequency = [row[1] for row in month_data]
+    line_chart = go.Scatter(
+        x=months,
+        y=frequency,
+        name='Faults per Month'
+    )
+    line_chart_json = json.dumps(line_chart, cls=PlotlyJSONEncoder)
+
+
+    return render_template('graphs.html', bar_graph=bar_graph_json, pie_chart=pie_chart_json, histogram=histogram_json, line_chart=line_chart_json)

@@ -76,3 +76,72 @@ def query_fault_log():
     cursor.execute("SELECT * FROM fault_log")
     fault_log_data = cursor.fetchall()
     return fault_log_data
+
+# Queries all fault_type values and the frequency they occur in fault_log table.
+def query_fault_type_freq():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT fault_type, COUNT(*) FROM fault_log GROUP BY fault_type")
+    fault_type_freq = cursor.fetchall()
+    return fault_type_freq
+
+
+# Queries all floor_name values and the frequency they occur in fault_log table.
+def query_floor_freq():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT floor_name, COUNT(*) FROM fault_log GROUP BY floor_name")
+    floor_freq = cursor.fetchall()
+    return floor_freq
+
+
+# Queries all room_name values and the frequency they occur in fault_log table.
+def query_room_freq():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT room_name, COUNT(*) FROM fault_log GROUP BY room_name")
+    room_freq = cursor.fetchall()
+    return room_freq
+
+
+# Queries what month an entry occurred based on the month string value
+def query_month_data():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("""
+            SELECT 
+                CASE WHEN strftime('%m', log_date) ="01" Then "JAN" 
+                WHEN strftime('%m', log_date) ="02" Then "FEB" 
+                WHEN strftime('%m', log_date) ="03" THEN "MAR" 
+                WHEN strftime('%m', log_date) ="04" THEN "APR" 
+                WHEN strftime('%m', log_date) ="05" THEN "MAY" 
+                WHEN strftime('%m', log_date) ="06" THEN "JUN" 
+                WHEN strftime('%m', log_date) ="07" THEN "JUL" 
+                WHEN strftime('%m', log_date) ="08" THEN "AUG" 
+                WHEN strftime('%m', log_date) ="09" THEN "SEP" 
+                WHEN strftime('%m', log_date) ="10" THEN "OCT" 
+                WHEN strftime('%m', log_date) ="11" THEN "NOV" 
+                WHEN strftime('%m', log_date) ="12" THEN "DEC" 
+                END AS log_month,
+                COUNT(*) AS entry_count
+            FROM 
+                fault_log
+            GROUP BY 
+                log_month
+            ORDER BY 
+                CASE 
+                    WHEN strftime('%m', log_date) ="01" THEN 1 
+                    WHEN strftime('%m', log_date) ="02" THEN 2 
+                    WHEN strftime('%m', log_date) ="03" THEN 3 
+                    WHEN strftime('%m', log_date) ="04" THEN 4 
+                    WHEN strftime('%m', log_date) ="05" THEN 5 
+                    WHEN strftime('%m', log_date) ="06" THEN 6 
+                    WHEN strftime('%m', log_date) ="07" THEN 7 
+                    WHEN strftime('%m', log_date) ="08" THEN 8 
+                    WHEN strftime('%m', log_date) ="09" THEN 9 
+                    ELSE CAST(strftime('%m', log_date) AS INTEGER) 
+                END;
+        """)
+    month_data = cursor.fetchall()
+    conn.close()
+    return month_data
