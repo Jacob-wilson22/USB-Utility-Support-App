@@ -4,9 +4,9 @@ from flask import Blueprint, render_template, request, redirect, flash, url_for,
 from flask_login import login_required, login_user, logout_user, current_user
 from werkzeug.security import check_password_hash
 from query import *
-from models import Fault_log, User
+from models import Fault_log, Tasks, User
 from datetime import datetime
-from forms import DeviceLogForm, RegisterForm, LoginForm
+from forms import DeviceLogForm, TaskAssignmentForm, RegisterForm, LoginForm
 import plotly.graph_objs as go
 from plotly.utils import PlotlyJSONEncoder
 
@@ -18,6 +18,7 @@ fault_log_blueprint = Blueprint('fault_log', __name__)
 graphs_blueprint = Blueprint('graphs', __name__)
 users_blueprint = Blueprint('users', __name__)
 index_blueprint = Blueprint('index', __name__)
+tasks_blueprint = Blueprint('tasks', __name__)
 
 
 # Register frame blueprint
@@ -236,3 +237,63 @@ def graphs():
 
 
     return render_template('graphs.html', bar_graph=bar_graph_json, pie_chart=pie_chart_json, histogram=histogram_json, line_chart=line_chart_json)
+
+
+# Tasks management frame blueprint
+@tasks_blueprint.route('/tasks', methods=['GET'])
+def tasks():
+    print(current_user)
+    return render_template('tasks.html')
+
+
+# Task assignment frame blueprint
+@tasks_blueprint.route('/task_assignment', methods=['GET', 'POST'])
+def task_assignment():
+    current_username = current_user.username
+    user_role_data = query_user_role_data(current_username)
+    if user_role_data == 'user':
+        flash('Access denied! Admin Users Only!', 'error')
+        return redirect(url_for('tasks.tasks'))
+
+    from app import db
+    username_data = query_user_data()
+    form = TaskAssignmentForm()
+    form.username.choices = username_data
+    if request.method == 'POST' and form.validate_on_submit():
+        task_description = form.task_description.data
+        username = form.username.data
+        deadline = form.deadline.data
+
+        new_task = Tasks(
+            task_description=task_description,
+            assigned_to=username,
+            deadline=deadline
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        return 'Task submitted successfully!'
+    return render_template('task_assignment.html', username_data=username_data, form=form)
+
+
+# Task view frame blueprint
+@tasks_blueprint.route('/task_view', methods=['GET', 'POST'])
+def task_view():
+    from app import db
+
+    task_data = query_task_data()
+    if request.method == 'POST':
+        task_id = request.form.get('task_id')
+        if task_id:
+            # Here you can handle the completion of the task and deletion
+            flash(f'Task with ID {task_id} completed and deleted.', 'success')
+            # Perform the deletion or other operations on the task
+            task_to_delete = Tasks.query.get(task_id)
+            if task_to_delete:
+                db.session.delete(task_to_delete)
+                db.session.commit()
+                # Optionally, you might want to redirect the user after successful deletion
+                return redirect(url_for('tasks.task_view'))
+            else:
+                flash('Task not found.', 'error')
+
+    return render_template('task_view.html', task_data=task_data)
