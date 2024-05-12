@@ -104,6 +104,36 @@ def query_room_freq():
     return room_freq
 
 
+# Queries username from users table
+def query_user_data():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users")
+    username_data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return [username[0] for username in username_data]
+
+
+# Queries role form users table based on value of variable username.
+def query_user_role_data(username):
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT role FROM users WHERE username=?", (username,))
+    user_role_data = cursor.fetchone()  # Use fetchone() to get only one row
+    conn.close()
+    return user_role_data[0] if user_role_data else None  # Return role or None if no data found
+
+
+# Queries all attributes from tasks table
+def query_task_data():
+    conn = sqlite3.connect('instance/Diss.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM tasks")
+    task_data = cursor.fetchall()
+    return task_data
+
+
 # Queries what month an entry occurred based on the month string value
 def query_month_data():
     conn = sqlite3.connect('instance/Diss.db')

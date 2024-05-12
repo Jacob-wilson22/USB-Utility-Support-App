@@ -4,7 +4,7 @@ from config import Config
 from models import db, User
 from populate import populate_data
 from views import floors_blueprint, rooms_blueprint, devices_blueprint, fault_log_blueprint,\
-    graphs_blueprint, users_blueprint, index_blueprint
+    graphs_blueprint, users_blueprint, index_blueprint, tasks_blueprint
 
 
 # Flask creation and configuration
@@ -43,6 +43,7 @@ app.register_blueprint(fault_log_blueprint)
 app.register_blueprint(graphs_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(index_blueprint)
+app.register_blueprint(tasks_blueprint)
 
 # Run application if executed as main script
 if __name__ == '__main__':

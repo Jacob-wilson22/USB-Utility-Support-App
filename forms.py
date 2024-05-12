@@ -33,3 +33,11 @@ class DeviceLogForm(FlaskForm):
     fault_severity = StringField('Fault Severity', validators=[InputRequired()])
     fault_description = TextAreaField('Fault Description', validators=[InputRequired()])
     submit = SubmitField('Submit')
+
+
+# Task assignment form
+class TaskAssignmentForm(FlaskForm):
+    username = SelectField('Username', choices=[], coerce=str)
+    task_description = TextAreaField('Task Description')
+    deadline = DateField('Deadline')
+    submit = SubmitField('Assign')

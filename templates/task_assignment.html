@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add Task</h1>
+<form method="POST">
+    {{ form.csrf_token }}
+    <div>
+        {{ form.username.label }}:
+        {{ form.username }}
+    </div>
+    <div>
+        {{ form.task_description.label }}: {{ form.task_description }}
+    </div>
+    <div>
+        {{ form.deadline.label }}: {{ form.deadline }}
+    </div>
+    <div>
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}
